@@ -1,10 +1,12 @@
 package br.ufrn.imd.psi;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Scanner;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /*
  * Bing Search via classe URL
@@ -23,32 +25,53 @@ public class Main {
 
 		Scanner inKboard = new Scanner(System.in);
 		String read, readNew;
+		int readNumber;
 
 		System.out.println("Digite sua pesquisa: ");
 		read = inKboard.nextLine();
 		readNew = read.replaceAll(" ", "+");
 
-		String link = "https://www.bing.com/search?q=" + readNew + "&count=50";
-		//String link = "http://www.imd.ufrn.br";
-		//String link = "https://www.google.com.br/search?q=links+interessantes&sourceid=ie7&rls=com.microsoft:en-US:IE-Address&ie=&oe=&gfe_rd=cr&ei=AnE_Vue4O8SU8QfU8KbYBw";
-		URL u = new URL(link);
+		System.out.println("Digite a quantidade de resultados que você deseja: ");
+		readNumber = inKboard.nextInt();
+		
+		inKboard.close();
+		int i = 1;
+		int count = 1;
+		int f = 1;
 
-		HttpURLConnection http = (HttpURLConnection) u.openConnection();
-		System.out.println(http.getResponseCode());
-		System.out.println(http.getResponseMessage());
-		System.out.println(http.getRequestMethod());
-		System.out.println(link);
-		try {
+		while (readNumber >= 1) {
 			
-			InputStream in = u.openStream();
-			int c;
-			while ((c = in.read()) != -1) {
-				System.out.print((char) c);
+			if(readNumber > 50){
+				count = 50;
+			} else{
+				count = readNumber;
 			}
-			in.close();
-		} catch (IOException ex) {
-			System.err.println(ex);
-		}
+			
+			String link = "http://www.bing.com/search?q=" + readNew + "&count=" + count + "&first=" + i + "&FORM=PERE";
 
+//			URL u = new URL(link);
+//			HttpURLConnection http = (HttpURLConnection) u.openConnection();
+//			System.out.println(http.getResponseCode());
+//			System.out.println(http.getResponseMessage());
+//			System.out.println(http.getRequestMethod());
+//			System.out.println(link);
+
+			Document document = Jsoup.connect(link).get();
+
+			System.out.println(link);
+			
+			Elements elements = document.getElementsByClass("b_algo");
+
+			for (Element element : elements) {
+				String h4 = element.getElementsByTag("a").attr("href");
+				System.out.println(h4);
+			}
+			
+			readNumber -= 50;
+			i +=50;
+			
+			System.out.println("loop " + f);
+			f++;
+		}
 	}
 }
